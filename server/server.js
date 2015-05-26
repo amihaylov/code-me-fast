@@ -1,19 +1,29 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var passwordHash = require('password-hash');
+var mysql = require('mysql');
+
 var app = express();
 app.use(express.static('frontend/'));
+
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : ''
+});
 
 app.use(bodyParser.urlencoded({
 	 extended: true
 }));
 app.use(bodyParser.json());
 
+//Redirect to index.html
 app.get('/', function (req, res) {
     
     res.sendFile('./frontend/index.html', { root: __dirname });
 });
 
+//Check if variable is set
 function isSet(variable){
     if(typeof variable == 'undefined'){
         return false;
@@ -29,6 +39,7 @@ app.get('/api', function (req, res) {
     }
 });
 
+//Login logic
 app.post('/api/login', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
@@ -75,6 +86,9 @@ app.post('/api/projects', function (req, res){
 
 app.post('/api/tasks', function (req, res){
     if(isSet(req.body.code)){
+        var date = new Date();
+        var month = date.getMonth();
+        var day = date.getDate();
         //TODO: upload code for approval
     }
     else
