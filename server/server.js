@@ -4,12 +4,14 @@ var passwordHash = require('password-hash');
 var mysql = require('mysql');
 
 var app = express();
+
 app.use(express.static('frontend/'));
 
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : ''
+  password : '',
+  database : 'codemefast'
 });
 
 app.use(bodyParser.urlencoded({
@@ -34,9 +36,13 @@ function isSet(variable){
 }
 
 app.get('/api', function (req, res) {
-    if(isSet(req.body.username)){
-        //TODO: return data for the user
-    }
+    connection.query("SELECT username FROM users", function(error, rows, fields){
+        var a = rows[0];
+        var parsed = JSON.stringify(a);
+        var obj = JSON.parse(parsed);
+        res.write(obj.username);
+        res.end("");
+    });
 });
 
 //Login logic
