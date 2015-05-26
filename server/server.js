@@ -36,13 +36,17 @@ function isSet(variable){
 }
 
 app.get('/api', function (req, res) {
-    connection.query("SELECT username FROM users", function(error, rows, fields){
-        var a = rows[0];
-        var parsed = JSON.stringify(a);
-        var obj = JSON.parse(parsed);
-        res.write(obj.username);
+    /*connection.query("SELECT * FROM users", function(error, rows, fields){
+        var a = rows;
+        res.write(JSON.stringify(a));
         res.end("");
-    });
+    });*/
+    if(isSet(req.body.username)){
+        //TODO: return data for the user
+    }
+    else{
+        res.end();
+    }
 });
 
 //Login logic

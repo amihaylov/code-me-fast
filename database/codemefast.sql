@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 26, 2015 at 05:18 PM
+-- Generation Time: May 27, 2015 at 12:01 AM
 -- Server version: 5.6.24
 -- PHP Version: 5.6.8
 
@@ -19,6 +19,18 @@ SET time_zone = "+00:00";
 --
 -- Database: `codemefast`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `achievements`
+--
+
+CREATE TABLE IF NOT EXISTS `achievements` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `xp` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -121,6 +133,26 @@ CREATE TABLE IF NOT EXISTS `users` (
   `backendxp` int(11) NOT NULL DEFAULT '0',
   `avatar` int(11) NOT NULL DEFAULT '1',
   `level` int(11) NOT NULL DEFAULT '1'
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `username`, `password`, `uixp`, `dbxp`, `serverxp`, `backendxp`, `avatar`, `level`) VALUES
+(1, 'pep4eto1211', '1234', 0, 0, 0, 0, 1, 1),
+(2, 'baigosho', 'asdfg', 0, 0, 0, 0, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `usersachievements`
+--
+
+CREATE TABLE IF NOT EXISTS `usersachievements` (
+  `id` int(11) NOT NULL,
+  `user` int(11) NOT NULL,
+  `achievement` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -138,6 +170,12 @@ CREATE TABLE IF NOT EXISTS `usersprojects` (
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `achievements`
+--
+ALTER TABLE `achievements`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `codesforsubmition`
@@ -182,6 +220,12 @@ ALTER TABLE `users`
   ADD PRIMARY KEY (`id`), ADD UNIQUE KEY `username` (`username`);
 
 --
+-- Indexes for table `usersachievements`
+--
+ALTER TABLE `usersachievements`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `usersprojects`
 --
 ALTER TABLE `usersprojects`
@@ -191,6 +235,11 @@ ALTER TABLE `usersprojects`
 -- AUTO_INCREMENT for dumped tables
 --
 
+--
+-- AUTO_INCREMENT for table `achievements`
+--
+ALTER TABLE `achievements`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `codesforsubmition`
 --
@@ -225,6 +274,11 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+--
+-- AUTO_INCREMENT for table `usersachievements`
+--
+ALTER TABLE `usersachievements`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `usersprojects`
