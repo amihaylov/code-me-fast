@@ -1,7 +1,10 @@
 var CodemefastApp = (function() {
 
-  var checkStatus = function(status){
+  var checkStatus = function(status, username){
     switch(status) {
+        default:
+          alert("No connection!");
+          break;
         case 'nouser':
           alert("There is no such user!");
           break;
@@ -9,8 +12,7 @@ var CodemefastApp = (function() {
           alert("Wrong password. Try again.");
           break;
         case 'ok':
-        default:
-          //LoadIndex.loadIndex(username);
+          sessionStorage.setItem(loginData.username);
           console.log("Yes be.");
           break;
       }
@@ -21,11 +23,34 @@ var CodemefastApp = (function() {
       type: "POST",
       url: '../api/login',
       data: loginData,
-      success: function(resp){checkStatus(resp);},
+      success: function(resp){checkStatus(resp, loginData.username);},
       error: function(error){console.log("Error " + error)}
     });
     return (status);
   };
+
+  var getUser = function(username) {
+    $.get({"/api/" + username, function(data){
+        //Do some shit with user data.
+      }
+    },"json");
+  };
+
+  var getProjectByUsername = function(username){
+    $.get({ "/api/users/projects/" + username, function(data) {
+      //DO Something
+    },"json");
+
+    };
+  }
+
+  var getProjectById = function(id){
+    $.get({ "/api/projects/" + id, function(data) {
+      //DO Something
+    },"json");
+
+    };
+  }
 
   //TODO Make selector for id
   var updateBook = function(book) {
