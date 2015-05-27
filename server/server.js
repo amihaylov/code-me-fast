@@ -109,16 +109,20 @@ app.get('/api/tasks', function (req, res) {
     else 
     if((isSet(req.query.username)) && (isSet(req.query.project))){
         //get all tasks for current project
-        connection.query("SELECT * FROM tasks WHERE user = " + req.query.username + " AND project = " + req.query.project, function(error, rows, fields){
-            if(rows.length > 0){
-                var row = rows;
-                res.write(JSON.stringify(row));
-                res.end("");
-            }
-            else{
-                res.write("no");
-                res.end();
-            }
+        var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.query.project, function(error, rows, fields){
+                if(rows.length > 0){
+                    var row = rows;
+                    res.write(JSON.stringify(row));
+                    res.end("");
+                }
+                else{
+                    res.write("no");
+                    res.end();
+                }
+            });
         });
     }
     else{
