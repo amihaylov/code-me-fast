@@ -25,6 +25,12 @@ app.get('/', function (req, res) {
     res.sendFile('./frontend/index.html', { root: __dirname });
 });
 
+//Redirect to login page
+app.get('/login', function (req, res) {
+    
+    res.sendFile('./frontend/login.html', { root: __dirname });
+});
+
 //Check if variable is set
 function isSet(variable){
     if(typeof variable == 'undefined'){
@@ -57,6 +63,7 @@ app.get('/api', function (req, res) {
 app.post('/api/login', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
+    console.log(username);
     connection.query("SELECT password FROM users WHERE username = '" + username + "'", function(error, rows, fields){
         if(rows.length > 0){
             var row = rows[0];
@@ -130,21 +137,66 @@ app.get('/api/tasks', function (req, res) {
     }
 });
 
+//API for the notifications
 app.get('/api/notifications', function (req, res) {
-    if(req.body.getContent == "false"){
-        //TODO: get notification count
+    if(req.query.getContent == "false"){
+        //get notification count
+        var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT id FROM notifications WHERE user = " + userId, function(error, rows, fields){
+                res.write(rows.length.toString());
+                res.end();
+            });
+        });
     }
     else{
-        //TODO: get all notifications with content
+        //get all notifications with content
+        var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT * FROM notifications WHERE user = " + userId, function(error, rows, fields){
+                if(rows.length > 0){
+                    res.write(JSON.stringify(rows));
+                    res.end();
+                }
+                else{
+                    res.write("no");
+                    res.end();
+                }
+            });
+        });
     }
 });
 
 app.get('/api/messages', function (req, res) {
-    if(req.body.getContent == "false"){
-        //TODO: get messages count
+    if(req.query.getContent == "false"){
+        //get messages count
+        var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT id FROM messages WHERE receiver = " + userId, function(error, rows, fields){
+                res.write(rows.length.toString());
+                res.end();
+            });
+        });
     }
     else{
-        //TODO: get all messages with content
+        //get all messages with content
+        var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT * FROM messages WHERE receiver = " + userId, function(error, rows, fields){
+                if(rows.length > 0){
+                    res.write(JSON.stringify(rows));
+                    res.end();
+                }
+                else{
+                    res.write("no");
+                    res.end();
+                }
+            });
+        });
     }
 });
 
