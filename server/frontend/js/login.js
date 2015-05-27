@@ -3,10 +3,10 @@
 $( document ).ready(function(){
    // init stuff here
    	var status;
-    $('button#submit').bind('click', function(){
+    $('#submit').bind('click', function(){
     	var loginData = {
-    		username: $('input#username').val(),
-    		password: $('input#password').val()
+    		username: $('#username').val(),
+    		password: $('#password').val()
     	};
     	status = CodemefastApp.loginUser(loginData);
     	console.log(status + ' ' + username);

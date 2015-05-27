@@ -5,14 +5,13 @@ var CodemefastApp = (function() {
     var status = "";
     $.ajax({
       type: "POST",
-      url: '/api/login',
+      url: '../api/login',
       data: loginData,
       success: function(resp){status = resp;}
     });
     return (status);
   };
 
-  
 
   //TODO Make selector for id
   var updateBook = function(book) {
