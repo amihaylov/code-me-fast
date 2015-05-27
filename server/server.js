@@ -63,7 +63,6 @@ app.get('/api', function (req, res) {
 app.post('/api/login', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    console.log(username);
     connection.query("SELECT password FROM users WHERE username = '" + username + "'", function(error, rows, fields){
         if(rows.length > 0){
             var row = rows[0];
@@ -80,18 +79,6 @@ app.post('/api/login', function (req, res) {
         res.end("");
     });
 });
-
-//Get uder id
-function getUserId(username){
-    connection.query("SELECT id FROM users WHERE username = '" + username + "'", function(error, rows, fields){
-        if(rows.length > 0){
-            return JSON.parse(JSON.stringify(rows[0])).id;
-        }
-        else{
-            return null;
-        }
-    });
-}
 
 //API for the tsks
 app.get('/api/tasks', function (req, res) {
@@ -202,7 +189,14 @@ app.get('/api/messages', function (req, res) {
 
 app.post('/api/projects', function (req, res){
     if((isSet(req.body.project)) && (isSet(req.body.newUser)) && (isSet(req.body.username))){
-        //TODO: Add user to project
+        //Add user to project
+         var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.body.newUser + "'", function(error, rows, fields){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("INSERT INTO usersprojects(user, project) VALUES(" + userId + ", " + req.body.project + ")", function(error, rows, fields){
+                res.end();
+            });
+        });
     }
     else
     if((isSet(req.body.projectName)) && (isSet(req.body.username))){
