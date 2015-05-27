@@ -41,8 +41,12 @@ app.get('/api', function (req, res) {
         res.write(JSON.stringify(a));
         res.end("");
     });*/
-    if(isSet(req.body.username)){
-        //TODO: return data for the user
+    if(isSet(req.query.username)){
+        connection.query("SELECT * FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+            var row = rows[0];
+            res.write(JSON.stringify(row));
+            res.end("");
+        });
     }
     else{
         res.end();
@@ -53,16 +57,72 @@ app.get('/api', function (req, res) {
 app.post('/api/login', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    password = passwordHash.generate(password);
+    connection.query("SELECT password FROM users WHERE username = '" + username + "'", function(error, rows, fields){
+        if(rows.length > 0){
+            var row = rows[0];
+            if(passwordHash.verify(password, JSON.parse(JSON.stringify(row)).password)){
+                res.write("ok");
+            }
+            else{
+                res.write("no");
+            }
+        }
+        else{
+            res.write("nouser");
+        }
+        res.end("");
+    });
 });
 
+//Get uder id
+function getUserId(username){
+    connection.query("SELECT id FROM users WHERE username = '" + username + "'", function(error, rows, fields){
+        if(rows.length > 0){
+            return JSON.parse(JSON.stringify(rows[0])).id;
+        }
+        else{
+            return null;
+        }
+    });
+}
+
+//API for the tsks
 app.get('/api/tasks', function (req, res) {
-    if((isSet(req.body.username)) && (!isSet(req.body.project))){
-        //TODO: Get all tasks from database
+    if((isSet(req.query.username)) && (!isSet(req.query.project))){
+        //Get all tasks from database
+        var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT * FROM tasks WHERE user = " + userId, function(error, rows, fields){
+                if(rows.length > 0){
+                    var row = rows;
+                    res.write(JSON.stringify(row));
+                    res.end("");
+                }
+                else{
+                    res.write("no");
+                    res.end();
+                }
+            });
+        });
     }
     else 
-    if((isSet(req.body.username)) && (isSet(req.body.project))){
-        //TODO: get all tasks for current project
+    if((isSet(req.query.username)) && (isSet(req.query.project))){
+        //get all tasks for current project
+        connection.query("SELECT * FROM tasks WHERE user = " + req.query.username + " AND project = " + req.query.project, function(error, rows, fields){
+            if(rows.length > 0){
+                var row = rows;
+                res.write(JSON.stringify(row));
+                res.end("");
+            }
+            else{
+                res.write("no");
+                res.end();
+            }
+        });
+    }
+    else{
+        res.end();
     }
 });
 
