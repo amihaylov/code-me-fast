@@ -1,17 +1,31 @@
 var CodemefastApp = (function() {
 
-  
+  var checkStatus = function(status){
+    switch(status) {
+        case 'nouser':
+          alert("There is no such user!");
+          break;
+        case 'no':
+          alert("Wrong password. Try again.");
+          break;
+        case 'ok':
+        default:
+          //LoadIndex.loadIndex(username);
+          console.log("Yes be.");
+          break;
+      }
+  }
+
   var loginUser = function(loginData) {
-    var status = "";
     $.ajax({
       type: "POST",
       url: '../api/login',
       data: loginData,
-      success: function(resp){status = resp;}
+      success: function(resp){checkStatus(resp);},
+      error: function(error){console.log("Error " + error)}
     });
     return (status);
   };
-
 
   //TODO Make selector for id
   var updateBook = function(book) {
