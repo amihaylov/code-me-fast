@@ -85,7 +85,7 @@ app.get('/api/alltasks/:username', function(req, res){
     connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
         if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
-            connection.query("SELECT * FROM tasks WHERE user = " + userId, function(error, rows, fields){
+            connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND finished = 0", function(error, rows, fields){
                 if(rows.length > 0){
                     var row = rows;
                     res.write(JSON.stringify(row));
@@ -100,6 +100,29 @@ app.get('/api/alltasks/:username', function(req, res){
             res.end("nouser");
         }
     });
+});
+
+app.get('/api/unfinishedtasksforproject/:project/:username', function(req, res){
+    //Get all tsks for current project and current user
+     var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+            if(rows.length > 0){
+                userId =  JSON.parse(JSON.stringify(rows[0])).id;
+                connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project + " AND finished = 0", function(error, rows, fields){
+                    if(rows.length > 0){
+                        var row = rows;
+                        res.write(JSON.stringify(row));
+                        res.end("");
+                    }
+                    else{
+                        res.end("no");
+                    }
+                });
+            }
+            else{
+                res.end("nouser");
+            }
+        });
 });
 
 app.get('/api/alltasksforproject/:project/:username', function(req, res){
@@ -290,9 +313,11 @@ app.post('/api/tasks', function (req, res){
         connection.query("SELECT id FROM users WHERE username = '" + req.body.username + "'", function(error, rows, fields){
             if(rows.length > 0){
                 userId =  JSON.parse(JSON.stringify(rows[0])).id;
-                connection.query("INSERT INTO codesforsubmition(task, user, code, uploaddate, uploadmonth, uploadyear) VALUES(" + req.body.taskId + ", " 
-                                 + userId + ", '" + req.body.code + "', " + day + ", " + month + ", " + year + ")", function(error, rows, fields){
-                    res.end("ok");
+                connection.query("DELETE FROM codesforsubmition WHERE task = " + req.body.taskId, function(error, rows, fields){
+                    connection.query("INSERT INTO codesforsubmition(task, user, code, uploaddate, uploadmonth, uploadyear) VALUES(" + req.body.taskId + ", " 
+                                     + userId + ", '" + req.body.code + "', " + day + ", " + month + ", " + year + ")", function(error, rows, fields){
+                        res.end("ok");
+                    });
                 });
             }
             else{
@@ -344,6 +369,14 @@ app.put('/api/projects/:projectId/:description/:username', function (req, res){
         else{
             res.end("no");
         }
+    });
+});
+
+app.put('/api/tasks/:taskId', function(req, res){
+    connection.query("UPDATE tasks SET finished = 1 WHERE id = " + req.params.taskId, function(error, rows, fields){
+        connection.query("DELETE FROM codesforsubmition WHERE task = " + req.params.taskId, function(error, rows, fields){
+            res.end("ok");
+        });
     });
 });
 
