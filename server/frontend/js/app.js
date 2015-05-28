@@ -1,5 +1,6 @@
 var CodemefastApp = (function() {
 
+  //Used in loginUser as callback
   var checkStatus = function(status, username){
     switch(status) {
         default:
@@ -12,8 +13,9 @@ var CodemefastApp = (function() {
           alert("Wrong password. Try again.");
           break;
         case 'ok':
-          sessionStorage.setItem(loginData.username);
+          sessionStorage.setItem('username', loginData.username);
           console.log("Yes be.");
+          location.href = "index.html";
           break;
       }
   }
@@ -30,27 +32,104 @@ var CodemefastApp = (function() {
   };
 
   var getUser = function(username) {
-    $.get({"/api/" + username, function(data){
+    $.get("/api/users/" + username, function(data){
         //Do some shit with user data.
-      }
+        sessionStorage.setItem('userid', data.id);
     },"json");
   };
 
-  var getProjectByUsername = function(username){
-    $.get({ "/api/users/projects/" + username, function(data) {
-      //DO Something
+  //Load all projects of the user in the menubar on the left
+  var getProjectsByUsername = function(username){
+    $.get( "/api/users/projects/" + username, function(data) {
+      var container = $('#menu-content');
+      container.empty();
+      for (var i=0; i<data.length; i+=1){
+        var item = $('<li></li>');
+        var anchor = $('<a></a>').text(data[i].name).attr("id", data[i].id).addClass("projects");
+        item.append(anchor);
+        container.append(item);
+      }
+
     },"json");
 
     };
-  }
 
+  //Load all project details when selected from the menubar on the left
+  //Does not return TASKS, FIX IT BY using another reques
   var getProjectById = function(id){
-    $.get({ "/api/projects/" + id, function(data) {
-      //DO Something
+    $.get( "/api/projects/" + id, function(data) {
     },"json");
 
     };
+
+  var getTasksByProjectAndUsername = function(projectid, username){
+    $.get("api/alltasksforproject/" + projectid + "/" + username, function(){
+      $.get( "/api/projects/" + id, function(data) {
+      var currentUser = sessionStorage.getItem('username');
+      var headerContainer = $('#project-header');
+      headerContainer.empty();
+      headerContainer.addClass("page-header");
+
+      var taskContainer = $('#task-container');
+      taskContainer.empty();
+
+      if(data.admin === currentUser) {
+        //Build admin window
+        var role = $('<p></p>').addClass("lead").text("Role: Admin");
+        var type = $('<p></p>').addClass("lead").text("Type: " + data.type);
+        headerContainer.append(role).append(type);
+      }
+      else {
+        //Build user window with tasks
+        var role = $('<p></p>').addClass("lead").text("Role: User");
+        var type = $('<p></p>').addClass("lead").text("Type: " + data.type);
+        headerContainer.append(role).append(type);
+
+        //DEBUG
+        console.log(sessionStorage.getItem('username'));
+
+        for (var i=0; i<data.length; i+=1){
+          if(data[i].user === sessionStorage.getItem('userid')){
+            var row = $('<tr></tr>');
+            var cellId = $('<td></td>').text(data[i].id);
+            var cellName = $('<td></td>').text(data[i].name);
+            var cellDesc = $('<td></td>').text(data[i].description);
+            var cellType = $('<td></td>').text(data[i].type);
+            var cellDifficulty = $('<td></td>').text(data[i].difficulty);
+            var cellFinished = $('<td></td>');
+              if(data[i].finished === 0)
+                cellFinished.text("No");
+              else
+                cellFinished.text("Yes");
+            var cellDeadline = $('<td></td>').text(data[i].deadlinedate +"-"+ 
+                            data[i].deadlinemonth +"-"+ data[i].deadlineyear);
+
+            row.append(cellId).append(cellName).append(cellDesc).append(cellType)
+                .append(cellDifficulty).append(cellFinished).append(cellDeadline);
+
+            var rowEdit = $('<tr></tr>');
+            var cellEditText = $('<td></td>');
+                cellEditText.prop({"colspan": "2"});
+            var editText = $("<input>");
+                editText.addClass(data[i].id);
+                editText.prop({"type":"text", "id": "edit-text"});
+
+            cellEditText.append(editText);
+             
+            var buttonEdit = $('<button></button>').text("Edit Task")
+                .addClass("btn btn-primary edit-task").addClass(data[i].id)
+                .prop({"type": "button"});
+            
+            var cellEdit = $('<td></td>');
+                cellEdit.append(buttonEdit); 
+            rowEdit.append(cellEditText).append(cellEdit);
+          }
+        }
+
+      }
+    },"json");
   }
+
 
   //TODO Make selector for id
   var updateBook = function(book) {

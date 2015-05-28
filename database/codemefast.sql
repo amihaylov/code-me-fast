@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 27, 2015 at 12:01 AM
+-- Generation Time: May 28, 2015 at 04:05 PM
 -- Server version: 5.6.24
 -- PHP Version: 5.6.8
 
@@ -42,8 +42,18 @@ CREATE TABLE IF NOT EXISTS `codesforsubmition` (
   `id` int(11) NOT NULL,
   `task` int(11) NOT NULL,
   `user` int(11) NOT NULL,
-  `code` text COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `code` text COLLATE utf8_unicode_ci NOT NULL,
+  `uploaddate` int(11) NOT NULL,
+  `uploadmonth` int(11) NOT NULL,
+  `uploadyear` int(11) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `codesforsubmition`
+--
+
+INSERT INTO `codesforsubmition` (`id`, `task`, `user`, `code`, `uploaddate`, `uploadmonth`, `uploadyear`) VALUES
+(4, 2, 1, 'sampleCode', 28, 5, 2015);
 
 -- --------------------------------------------------------
 
@@ -56,7 +66,14 @@ CREATE TABLE IF NOT EXISTS `messages` (
   `sender` int(11) NOT NULL,
   `receiver` int(11) NOT NULL,
   `message` text COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `messages`
+--
+
+INSERT INTO `messages` (`id`, `sender`, `receiver`, `message`) VALUES
+(1, 12, 1, 'Hello loooooooser!!!');
 
 -- --------------------------------------------------------
 
@@ -66,10 +83,16 @@ CREATE TABLE IF NOT EXISTS `messages` (
 
 CREATE TABLE IF NOT EXISTS `notifications` (
   `id` int(11) NOT NULL,
-  `fromuser` int(11) NOT NULL,
   `user` int(11) NOT NULL,
   `text` text COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `notifications`
+--
+
+INSERT INTO `notifications` (`id`, `user`, `text`) VALUES
+(1, 1, 'Sample notification');
 
 -- --------------------------------------------------------
 
@@ -84,7 +107,15 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `description` text COLLATE utf8_unicode_ci NOT NULL,
   `type` int(11) NOT NULL DEFAULT '0',
   `admin` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `projects`
+--
+
+INSERT INTO `projects` (`id`, `projectlevel`, `name`, `description`, `type`, `admin`) VALUES
+(1, 1, 'Just Another Project', 'Some brand new description', 0, 1),
+(3, 1, 'SAS', 'SAAAAS', 0, 2);
 
 -- --------------------------------------------------------
 
@@ -114,8 +145,12 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `type` varchar(4) COLLATE utf8_unicode_ci NOT NULL,
   `user` int(11) NOT NULL,
   `issidequest` int(11) NOT NULL DEFAULT '0',
-  `difficulty` int(11) NOT NULL DEFAULT '-1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  `difficulty` int(11) NOT NULL DEFAULT '-1',
+  `finished` int(11) NOT NULL DEFAULT '0',
+  `deadlinedate` int(11) NOT NULL,
+  `deadlinemonth` int(11) NOT NULL,
+  `deadlineyear` int(11) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -140,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `uixp`, `dbxp`, `serverxp`, `backendxp`, `avatar`, `level`) VALUES
-(1, 'pep4eto1211', '1234', 0, 0, 0, 0, 1, 1),
+(1, 'pep4eto1211', 'sha1$b7fc081e$1$a97fd77166032f561d1a01a9947ab1ffea8e3d29', 0, 0, 0, 0, 1, 1),
 (2, 'baigosho', 'asdfg', 0, 0, 0, 0, 1, 1);
 
 -- --------------------------------------------------------
@@ -165,7 +200,15 @@ CREATE TABLE IF NOT EXISTS `usersprojects` (
   `id` int(11) NOT NULL,
   `user` int(11) NOT NULL,
   `project` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `usersprojects`
+--
+
+INSERT INTO `usersprojects` (`id`, `user`, `project`) VALUES
+(3, 1, 1),
+(4, 1, 3);
 
 --
 -- Indexes for dumped tables
@@ -244,22 +287,22 @@ ALTER TABLE `achievements`
 -- AUTO_INCREMENT for table `codesforsubmition`
 --
 ALTER TABLE `codesforsubmition`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
 --
 -- AUTO_INCREMENT for table `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `projectsusersxp`
 --
@@ -269,7 +312,7 @@ ALTER TABLE `projectsusersxp`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `users`
 --
@@ -284,7 +327,7 @@ ALTER TABLE `usersachievements`
 -- AUTO_INCREMENT for table `usersprojects`
 --
 ALTER TABLE `usersprojects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -2,8 +2,14 @@
 // on document ready
 $( document ).ready(function(){
    // init stuff here
+   	CodemefastApp.getUser(sessionStorage.getItem('username'));
 
     $('#your-projects').on('click', function(){
-    	//Load the projects in the menu
+    	CodemefastApp.getProjectsByUsername(sessionStorage.getItem('username'));
+    });
+
+    $('.projects').on('click', function(){
+    	var id = $(this).attr('id');
+    	CodemefastApp.getTasksByProjectAndUsername(id, sessionStorage.getItem('username'));
     });
 })

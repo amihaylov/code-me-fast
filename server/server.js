@@ -78,13 +78,31 @@ app.post('/api/login', function (req, res) {
     });
 });
 
+//Register logic
+app.post("/api/register", function(req, res){
+    var username = req.body.username;
+    var password = req.body.password;
+    password = passwordHash.generate(password);
+    connection.query("SELECT id FROM users WHERE username = '" + username + "'", function(error, rows, fields){
+        if(rows.length == 0){
+            connection.query("INSERT INTO users(username, password) VALUES('" + username + "', '" + password + "')", function(error, rows, fields){
+                res.end("ok");
+            });
+        }
+        else{
+            res.end("no");
+        }
+    });
+});
+
 //API for the tsks
 app.get('/api/alltasks/:username', function(req, res){
+    //Get all tasks for user
     var userId;
     connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
         if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
-            connection.query("SELECT * FROM tasks WHERE user = " + userId, function(error, rows, fields){
+            connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND finished = 0", function(error, rows, fields){
                 if(rows.length > 0){
                     var row = rows;
                     res.write(JSON.stringify(row));
@@ -101,7 +119,32 @@ app.get('/api/alltasks/:username', function(req, res){
     });
 });
 
+app.get('/api/unfinishedtasksforproject/:project/:username', function(req, res){
+    //Get all tsks for current project and current user
+     var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+            if(rows.length > 0){
+                userId =  JSON.parse(JSON.stringify(rows[0])).id;
+                connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project + " AND finished = 0 AND issidequest = 0", 
+                                 function(error, rows, fields){
+                    if(rows.length > 0){
+                        var row = rows;
+                        res.write(JSON.stringify(row));
+                        res.end("");
+                    }
+                    else{
+                        res.end("no");
+                    }
+                });
+            }
+            else{
+                res.end("nouser");
+            }
+        });
+});
+
 app.get('/api/alltasksforproject/:project/:username', function(req, res){
+    //Get all tsks for current project and current user
      var userId;
         connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
             if(rows.length > 0){
@@ -231,6 +274,7 @@ app.post('/api/projects', function (req, res){
     }
 });
 
+//Get all users for given project
 app.get('/api/projects/users/:projectId', function(req, res){
         connection.query("SELECT DISTINCT users.username FROM users, usersprojects WHERE usersprojects.project = " + req.params.projectId, function(error, rows, fields){
             if(rows.length > 0){
@@ -259,7 +303,7 @@ app.get('/api/users/projects/:username', function(req, res){
     connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
         if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
-            connection.query("SELECT id, name FROM projects WHERE admin = " + userId, function(error, rows, fields){
+            connection.query("SELECT DISTINCT projects.id, projects.name FROM projects, usersprojects WHERE usersprojects.user = " + userId, function(error, rows, fields){
                 if(rows.length > 0){
                     res.write(JSON.stringify(rows));
                     res.end();
@@ -287,9 +331,11 @@ app.post('/api/tasks', function (req, res){
         connection.query("SELECT id FROM users WHERE username = '" + req.body.username + "'", function(error, rows, fields){
             if(rows.length > 0){
                 userId =  JSON.parse(JSON.stringify(rows[0])).id;
-                connection.query("INSERT INTO codesforsubmition(task, user, code, uploaddate, uploadmonth, uploadyear) VALUES(" + req.body.taskId + ", " 
-                                 + userId + ", '" + req.body.code + "', " + day + ", " + month + ", " + year + ")", function(error, rows, fields){
-                    res.end("ok");
+                connection.query("DELETE FROM codesforsubmition WHERE task = " + req.body.taskId, function(error, rows, fields){
+                    connection.query("INSERT INTO codesforsubmition(task, user, code, uploaddate, uploadmonth, uploadyear) VALUES(" + req.body.taskId + ", " 
+                                     + userId + ", '" + req.body.code + "', " + day + ", " + month + ", " + year + ")", function(error, rows, fields){
+                        res.end("ok");
+                    });
                 });
             }
             else{
@@ -329,31 +375,97 @@ app.put('/api/projects/:projectId/:description/:username', function (req, res){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
             connection.query("SELECT admin FROM projects WHERE id = " + req.params.projectId, function(error, rows, fields){
                 if(userId == JSON.parse(JSON.stringify(rows[0])).admin){
-                    
+                    connection.query("UPDATE projects SET description = '" + req.params.description + "' WHERE id = " + req.params.projectId, function(error, rows, fields){
+                        res.end("ok");
+                    });
                 }
                 else{
                     res.end("no");
                 }
             });
         }
+        else{
+            res.end("no");
+        }
     });
 });
 
-app.put('api/tasks', function (req, res){
-    //TODO: update task description
+app.put('/api/tasks/:taskId', function(req, res){
+    connection.query("UPDATE tasks SET finished = 1 WHERE id = " + req.params.taskId, function(error, rows, fields){
+        connection.query("DELETE FROM codesforsubmition WHERE task = " + req.params.taskId, function(error, rows, fields){
+            res.end("ok");
+        });
+    });
 });
 
-app.delete('api/projects', function (req, res){
-    if(!isSet(req.body.user)){
-        //TODO: Delete project
-    }
-    else{
-        //TODO: Remove user form project
-    }
+app.delete('/api/projects/:projectId/:username', function (req, res){
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT admin FROM projects WHERE id = " + req.params.projectId, function(error, rows, fields){
+                if(userId == JSON.parse(JSON.stringify(rows[0])).admin){
+                    connection.query("DELETE FROM projects WHERE id = " + req.params.projectId, function(error, rows, fields){
+                        res.end("ok");
+                    });
+                }
+                else{
+                    res.end("no");
+                }
+            });
+        }
+        else{
+            res.end("no");
+        }
+    });
 });
 
-app.delete('api/tasks', function (req, res){
-    //TODO: delete task
+app.delete('/api/projects/:projectId/:userToDelete/:username', function (req, res){
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT admin FROM projects WHERE id = " + req.params.projectId, function(error, rows, fields){
+                if(userId == JSON.parse(JSON.stringify(rows[0])).admin){
+                    connection.query("SELECT id FROM users WHERE username = '" + req.params.userToDelete + "'", function(error, rows, fields){
+                        var userToDeleteId = JSON.parse(JSON.stringify(rows[0])).id;
+                        connection.query("DELETE FROM usersprojects WHERE user = " + userToDeleteId + " AND project = " + req.params.projectId, function(error, rows, fields){
+                            res.end("ok");
+                        });
+                    });
+                }
+                else{
+                    res.end("no");
+                }
+            });
+        }
+        else{
+            res.end("no");
+        }
+    });
+});
+
+app.delete('/api/tasks/:taskId/:username', function (req, res){
+    //delete task
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT project FROM tasks WHERE id = " + req.params.taskId, function(error, rows, fields){
+                var projectId = JSON.parse(JSON.stringify(rows[0])).project;
+                connection.query("SELECT admin FROM projects WHERE id = " + projectId, function(error, rows, fields){
+                    if(userId == JSON.parse(JSON.stringify(rows[0])).admin){
+                        connection.query("DELETE FROM tasks WHERE id = " + req.params.taskId, function(error, rows, fields){
+                            res.end("ok");
+                        });
+                    }
+                    else{
+                        res.end("no");
+                    }
+                });
+            });
+        }
+        else{
+            res.end("no");
+        }
+    });
 });
 
 var server = app.listen(8080, function () {
