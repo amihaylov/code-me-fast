@@ -4,6 +4,13 @@ var passwordHash = require('password-hash');
 var mysql = require('mysql');
 
 var app = express();
+var router = express.Router();
+
+router.use(function(req, res, next) {
+    // do logging
+    console.log('Something is happening.');
+    next(); // make sure we go to the next routes and don't stop here
+});
 
 app.use(express.static('frontend/'));
 
@@ -18,6 +25,10 @@ app.use(bodyParser.urlencoded({
 	 extended: true
 }));
 app.use(bodyParser.json());
+
+app.use('/api', router);
+
+
 
 //Redirect to index.html
 app.get('/', function (req, res) {
@@ -41,22 +52,14 @@ function isSet(variable){
     }
 }
 
-app.get('/api', function (req, res) {
-    /*connection.query("SELECT * FROM users", function(error, rows, fields){
-        var a = rows;
-        res.write(JSON.stringify(a));
+//var api = {username : {username : 'projectId'}, projects: {projectId : 'projectId'}};
+
+app.get('/api/:username', function (req, res) {
+    connection.query("SELECT * FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        var row = rows[0];
+        res.write(JSON.stringify(row));
         res.end("");
-    });*/
-    if(isSet(req.query.username)){
-        connection.query("SELECT * FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
-            var row = rows[0];
-            res.write(JSON.stringify(row));
-            res.end("");
-        });
-    }
-    else{
-        res.end();
-    }
+    });
 });
 
 //Login logic
@@ -190,7 +193,7 @@ app.get('/api/messages', function (req, res) {
 app.post('/api/projects', function (req, res){
     if((isSet(req.body.project)) && (isSet(req.body.newUser)) && (isSet(req.body.username))){
         //Add user to project
-         var userId;
+        var userId;
         connection.query("SELECT id FROM users WHERE username = '" + req.body.newUser + "'", function(error, rows, fields){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
             connection.query("INSERT INTO usersprojects(user, project) VALUES(" + userId + ", " + req.body.project + ")", function(error, rows, fields){
@@ -200,8 +203,32 @@ app.post('/api/projects', function (req, res){
     }
     else
     if((isSet(req.body.projectName)) && (isSet(req.body.username))){
-        //TODO: Create new project
+        //Create new project
+        var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.body.username + "'", function(error, rows, fields){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("INSERT INTO projects(name, description, type, admin) VALUES('" + req.body.projectName + "', '" 
+                             + req.body.projectDescription + "', " + req.body.type + ", " + userId + ")", function(error, rows, fields){
+                res.end();
+            });
+        });
     }
+});
+
+app.get('/projects/:projectId', function(req, res){
+    connection.query("SELECT * FROM projects WHERE id = " + req.params.projectId, function(error, rows, fields){
+        if(rows.length > 0){
+            res.write(JSON.stringify(rows[0]));
+            res.end();
+        }
+        else{
+            res.end();
+        }
+    });
+});
+
+app.get('api/users/projects/:username', function(req, res){
+    
 });
 
 app.post('/api/tasks', function (req, res){
