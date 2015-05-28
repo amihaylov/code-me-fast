@@ -80,6 +80,7 @@ app.post('/api/login', function (req, res) {
 
 //API for the tsks
 app.get('/api/alltasks/:username', function(req, res){
+    //Get all tasks for user
     var userId;
     connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
         if(rows.length > 0){
@@ -102,6 +103,7 @@ app.get('/api/alltasks/:username', function(req, res){
 });
 
 app.get('/api/alltasksforproject/:project/:username', function(req, res){
+    //Get all tsks for current project and current user
      var userId;
         connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
             if(rows.length > 0){
@@ -231,6 +233,7 @@ app.post('/api/projects', function (req, res){
     }
 });
 
+//Get all users for given project
 app.get('/api/projects/users/:projectId', function(req, res){
         connection.query("SELECT DISTINCT users.username FROM users, usersprojects WHERE usersprojects.project = " + req.params.projectId, function(error, rows, fields){
             if(rows.length > 0){
@@ -259,7 +262,7 @@ app.get('/api/users/projects/:username', function(req, res){
     connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
         if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
-            connection.query("SELECT id, name FROM projects WHERE admin = " + userId, function(error, rows, fields){
+            connection.query("SELECT DISTINCT projects.id, projects.name FROM projects, usersprojects WHERE usersprojects.user = " + userId, function(error, rows, fields){
                 if(rows.length > 0){
                     res.write(JSON.stringify(rows));
                     res.end();
