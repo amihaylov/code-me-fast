@@ -1,34 +1,25 @@
+//Includeing mpodules
 var express = require('express');
 var bodyParser = require('body-parser');
 var passwordHash = require('password-hash');
 var mysql = require('mysql');
 
+//Some more basic settings
 var app = express();
 var router = express.Router();
-
-router.use(function(req, res, next) {
-    // do logging
-    console.log('Something is happening.');
-    next(); // make sure we go to the next routes and don't stop here
-});
-
 app.use(express.static('frontend/'));
+app.use(bodyParser.urlencoded({
+	 extended: true
+}));
+app.use(bodyParser.json());
 
+//Connecting to the database
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
   password : '',
   database : 'codemefast'
 });
-
-app.use(bodyParser.urlencoded({
-	 extended: true
-}));
-app.use(bodyParser.json());
-
-app.use('/api', router);
-
-
 
 //Redirect to index.html
 app.get('/', function (req, res) {
@@ -52,13 +43,17 @@ function isSet(variable){
     }
 }
 
-//var api = {username : {username : 'projectId'}, projects: {projectId : 'projectId'}};
-
-app.get('/api/:username', function (req, res) {
+//Get all thata for single user
+app.get('/api/users/:username', function (req, res) {
     connection.query("SELECT * FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
-        var row = rows[0];
-        res.write(JSON.stringify(row));
-        res.end("");
+        if(rows.length > 0){
+            var row = rows[0];
+            res.write(JSON.stringify(row));
+            res.end("");
+        }
+        else{
+            res.end("no");
+        }
     });
 });
 
@@ -84,11 +79,10 @@ app.post('/api/login', function (req, res) {
 });
 
 //API for the tsks
-app.get('/api/tasks', function (req, res) {
-    if((isSet(req.query.username)) && (!isSet(req.query.project))){
-        //Get all tasks from database
-        var userId;
-        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+app.get('/api/alltasks/:username', function(req, res){
+    var userId;
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
             connection.query("SELECT * FROM tasks WHERE user = " + userId, function(error, rows, fields){
                 if(rows.length > 0){
@@ -97,53 +91,59 @@ app.get('/api/tasks', function (req, res) {
                     res.end("");
                 }
                 else{
-                    res.write("no");
-                    res.end();
+                    res.end("no");
                 }
             });
+        }
+        else{
+            res.end("nouser");
+        }
+    });
+});
+
+app.get('/api/alltasksforproject/:project/:username', function(req, res){
+     var userId;
+        connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+            if(rows.length > 0){
+                userId =  JSON.parse(JSON.stringify(rows[0])).id;
+                connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project, function(error, rows, fields){
+                    if(rows.length > 0){
+                        var row = rows;
+                        res.write(JSON.stringify(row));
+                        res.end("");
+                    }
+                    else{
+                        res.end("no");
+                    }
+                });
+            }
+            else{
+                res.end("nouser");
+            }
         });
-    }
-    else 
-    if((isSet(req.query.username)) && (isSet(req.query.project))){
-        //get all tasks for current project
-        var userId;
-        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
-            userId =  JSON.parse(JSON.stringify(rows[0])).id;
-            connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.query.project, function(error, rows, fields){
-                if(rows.length > 0){
-                    var row = rows;
-                    res.write(JSON.stringify(row));
-                    res.end("");
-                }
-                else{
-                    res.write("no");
-                    res.end();
-                }
-            });
-        });
-    }
-    else{
-        res.end();
-    }
 });
 
 //API for the notifications
-app.get('/api/notifications', function (req, res) {
-    if(req.query.getContent == "false"){
-        //get notification count
-        var userId;
-        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+app.get("/api/notifications/count/:username", function(req, res){
+    var userId;
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
             connection.query("SELECT id FROM notifications WHERE user = " + userId, function(error, rows, fields){
                 res.write(rows.length.toString());
                 res.end();
             });
-        });
-    }
-    else{
-        //get all notifications with content
-        var userId;
-        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+        }
+        else{
+            res.end("nouser");
+        }
+    });
+});
+
+app.get("/api/notifications/:username", function(req, res){
+    var userId;
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
             connection.query("SELECT * FROM notifications WHERE user = " + userId, function(error, rows, fields){
                 if(rows.length > 0){
@@ -155,26 +155,36 @@ app.get('/api/notifications', function (req, res) {
                     res.end();
                 }
             });
-        });
-    }
+        }
+        else{
+            res.end("nouser");
+        }
+    });
 });
 
-app.get('/api/messages', function (req, res) {
-    if(req.query.getContent == "false"){
-        //get messages count
+//API for messages
+app.get('/api/messages/count/:username', function(req, res){
+    //get messages count
         var userId;
-        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
-            userId =  JSON.parse(JSON.stringify(rows[0])).id;
-            connection.query("SELECT id FROM messages WHERE receiver = " + userId, function(error, rows, fields){
-                res.write(rows.length.toString());
-                res.end();
-            });
+        connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+            if(rows.length > 0){
+                userId =  JSON.parse(JSON.stringify(rows[0])).id;
+                connection.query("SELECT id FROM messages WHERE receiver = " + userId, function(error, rows, fields){
+                    res.write(rows.length.toString());
+                    res.end();
+                });
+            }
+            else{
+                res.end("nouser");
+            }
         });
-    }
-    else{
-        //get all messages with content
-        var userId;
-        connection.query("SELECT id FROM users WHERE username = '" + req.query.username + "'", function(error, rows, fields){
+});
+
+app.get('/api/messages/:username', function (req, res) {
+    //get all messages with content
+    var userId;
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
             connection.query("SELECT * FROM messages WHERE receiver = " + userId, function(error, rows, fields){
                 if(rows.length > 0){
@@ -186,8 +196,11 @@ app.get('/api/messages', function (req, res) {
                     res.end();
                 }
             });
-        });
-    }
+        }
+        else{
+            res.end("nouser");
+        }
+    });
 });
 
 app.post('/api/projects', function (req, res){
@@ -213,22 +226,53 @@ app.post('/api/projects', function (req, res){
             });
         });
     }
+    else{
+        res.end();
+    }
 });
 
-app.get('/projects/:projectId', function(req, res){
+app.get('/api/projects/users/:projectId', function(req, res){
+        connection.query("SELECT DISTINCT users.username FROM users, usersprojects WHERE usersprojects.project = " + req.params.projectId, function(error, rows, fields){
+            if(rows.length > 0){
+                res.write(JSON.stringify(rows));
+                res.end();
+            }
+            else{
+                res.end("no");
+            }
+        });
+});
+
+app.get('/api/projects/:projectId', function(req, res){
     connection.query("SELECT * FROM projects WHERE id = " + req.params.projectId, function(error, rows, fields){
         if(rows.length > 0){
             res.write(JSON.stringify(rows[0]));
             res.end();
         }
         else{
-            res.end();
+            res.end("no");
         }
     });
 });
 
-app.get('api/users/projects/:username', function(req, res){
-    
+app.get('/api/users/projects/:username', function(req, res){
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT id, name FROM projects WHERE admin = " + userId, function(error, rows, fields){
+                if(rows.length > 0){
+                    res.write(JSON.stringify(rows));
+                    res.end();
+                }
+                else{
+                    res.end("no");
+                }
+            });
+        }
+        else{
+            res.end("nouser");
+        }
+    });
 });
 
 app.post('/api/tasks', function (req, res){
@@ -236,20 +280,63 @@ app.post('/api/tasks', function (req, res){
         var date = new Date();
         var month = date.getMonth();
         var day = date.getDate();
-        //TODO: upload code for approval
+        var year = date.getYear();
+        year += 1900;
+        month++;
+        //upload code for approval
+        connection.query("SELECT id FROM users WHERE username = '" + req.body.username + "'", function(error, rows, fields){
+            if(rows.length > 0){
+                userId =  JSON.parse(JSON.stringify(rows[0])).id;
+                connection.query("INSERT INTO codesforsubmition(task, user, code, uploaddate, uploadmonth, uploadyear) VALUES(" + req.body.taskId + ", " 
+                                 + userId + ", '" + req.body.code + "', " + day + ", " + month + ", " + year + ")", function(error, rows, fields){
+                    res.end("ok");
+                });
+            }
+            else{
+                res.end("nouser");
+            }
+        });
+        
     }
     else
     if((isSet(req.body.taskName)) && (isSet(req.body.description)) && (isSet(req.body.username))){
-        //TODO: Create new task
+        //Create new task
+        connection.query("SELECT id FROM users WHERE username = '" + req.body.username + "'", function(error, rows, fields){
+            if(rows.length > 0){
+                userId =  JSON.parse(JSON.stringify(rows[0])).id;
+                connection.query("INSERT INTO tasks(name, description, project, type, user, issidequest, difficulty, deadlinedate, deadlinemonth, deadlineyear) VALUES('" 
+                                 + req.body.taskName + "', '" + req.body.description + "', " + req.body.projectId + ", '" + req.body.type + "', " + userId + 
+                                 ", " + req.body.issidequest + ", " + req.body.difficulty + ", " + req.body.dldate + ", " + req.body.dlmonth + ", " + req.body.dlyear + ")", 
+                                 function(error, rows, fields){
+                    res.end("ok");
+                });
+            }
+            else{
+                res.end("nouser");
+            }
+        });
+        
     }
-    else
-    if((isSet(req.body.task)) && (isSet(req.body.newUser))){
-        //TODO: Add task to user
+    else{
+        res.end();
     }
 });
 
-app.put('api/projects', function (req, res){
-    //TODO: update project info
+app.put('/api/projects/:projectId/:description/:username', function (req, res){
+    //update project info
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
+            userId =  JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT admin FROM projects WHERE id = " + req.params.projectId, function(error, rows, fields){
+                if(userId == JSON.parse(JSON.stringify(rows[0])).admin){
+                    
+                }
+                else{
+                    res.end("no");
+                }
+            });
+        }
+    });
 });
 
 app.put('api/tasks', function (req, res){
