@@ -78,6 +78,23 @@ app.post('/api/login', function (req, res) {
     });
 });
 
+//Register logic
+app.post("/api/register", function(req, res){
+    var username = req.body.username;
+    var password = req.body.password;
+    password = passwordHash.generate(password);
+    connection.query("SELECT id FROM users WHERE username = '" + username + "'", function(error, rows, fields){
+        if(rows.length == 0){
+            connection.query("INSERT INTO users(username, password) VALUES('" + username + "', '" + password + "')", function(error, rows, fields){
+                res.end("ok");
+            });
+        }
+        else{
+            res.end("no");
+        }
+    });
+});
+
 //API for the tsks
 app.get('/api/alltasks/:username', function(req, res){
     //Get all tasks for user
@@ -108,7 +125,8 @@ app.get('/api/unfinishedtasksforproject/:project/:username', function(req, res){
         connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
             if(rows.length > 0){
                 userId =  JSON.parse(JSON.stringify(rows[0])).id;
-                connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project + " AND finished = 0", function(error, rows, fields){
+                connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project + " AND finished = 0 AND issidequest = 0", 
+                                 function(error, rows, fields){
                     if(rows.length > 0){
                         var row = rows;
                         res.write(JSON.stringify(row));
