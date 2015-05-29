@@ -63,7 +63,7 @@ app.post('/api/login', function (req, res) {
     var password = req.body.password;
     connection.query("SELECT password FROM users WHERE username = '" + username + "'", function(error, rows, fields){
         if(error){
-            res.end("no");
+            res.end("dberror");
         }
         else{
             if(rows.length > 0){
