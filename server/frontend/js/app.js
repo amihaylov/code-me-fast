@@ -23,7 +23,7 @@ var CodemefastApp = (function() {
   var loginUser = function(loginData) {
     $.ajax({
       type: "POST",
-      url: '../api/login',
+      url: '/api/login',
       data: loginData,
       success: function(resp){checkStatus(resp, loginData.username);},
       error: function(error){console.log("Error " + error)}
@@ -64,7 +64,6 @@ var CodemefastApp = (function() {
 
   var getTasksByProjectAndUsername = function(projectid, username){
     $.get("api/alltasksforproject/" + projectid + "/" + username, function(){
-      $.get( "/api/projects/" + id, function(data) {
       var currentUser = sessionStorage.getItem('username');
       var headerContainer = $('#project-header');
       headerContainer.empty();
@@ -128,7 +127,7 @@ var CodemefastApp = (function() {
 
       }
     },"json");
-  }
+  };
 
 
   //TODO Make selector for id
