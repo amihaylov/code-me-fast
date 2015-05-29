@@ -105,7 +105,6 @@ app.post("/api/register", function(req, res){
 app.get('/api/alltasks/:username', function(req, res){
     //Get all tasks for user
     var userId;
-    console.log(req.params.username);
     connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
         if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;

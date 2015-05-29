@@ -1,28 +1,28 @@
 package com.boyko.codemefast;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import java.awt.event.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class BottomPanel extends JPanel {
     CardLayout cl = new CardLayout();
     JPanel contentPanel = new JPanel();
-    private ImageIcon addProjectIcon = new ImageIcon(getClass().getResource("add.png"));
+    private ImageIcon addProjectIcon = new ImageIcon(getClass().getResource("Icons/AddIcon.png"));
     private JButton submitTask = Utility.createButton("add", KeyEvent.VK_ENTER);
     private JScrollPane allTaskScrollPane;
     private JScrollPane projectPanelScrollPane;
@@ -37,17 +37,118 @@ public class BottomPanel extends JPanel {
     private JScrollPane createAllTasksPanel() {
         JPanel allTasksPanel = new JPanel();
         allTasksPanel.setLayout(new BoxLayout(allTasksPanel, BoxLayout.Y_AXIS));
-        for (int i = 1; i < 100; i++) {
-            JLabel lbl = new JLabel("CodemeFast" + "Task" + i + "");
-            lbl.setFont(new Font("Serif", Font.ITALIC, 20));
-            allTasksPanel.add(lbl);
-            allTasksPanel.add(Box.createVerticalStrut(20));
+        try {
+            String allTasksJsonArrayString = ServerConnectionUtils.getRequest("api/alltasks/" + UserData.getCurrentUser());
+            if(!allTasksJsonArrayString.equals("no") && !allTasksJsonArrayString.equals("nouser")) {
+                JSONArray tasksArray = new JSONArray(allTasksJsonArrayString);
+                for (int i = 0; i < tasksArray.length(); i++) {
+                    JSONObject singleTask = tasksArray.getJSONObject(i);
+                    String taskId = singleTask.getString("id");
+                    String taskName = singleTask.getString("name");
+                    String taskDescription = singleTask.getString("description");
+                    String taskType = singleTask.getString("type");
+                    StartPageTask taskPanel = new StartPageTask(taskName, taskDescription, taskType);
+                    taskPanel.addMouseListener(new MouseListener() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            JOptionPane.showMessageDialog(null, taskDescription, "Task description", JOptionPane.PLAIN_MESSAGE);
+                        }
+
+                        @Override
+                        public void mousePressed(MouseEvent e) {
+
+                        }
+
+                        @Override
+                        public void mouseReleased(MouseEvent e) {
+
+                        }
+
+                        @Override
+                        public void mouseEntered(MouseEvent e) {
+
+                        }
+
+                        @Override
+                        public void mouseExited(MouseEvent e) {
+
+                        }
+                    });
+                    allTasksPanel.add(taskPanel);
+                    allTasksPanel.add(Box.createVerticalStrut(20));
+                }/*
+            for (int i = 1; i < 100; i++) {
+                JLabel lbl = new JLabel("CodemeFast" + "Task" + i + "");
+                lbl.setFont(new Font("Serif", Font.ITALIC, 20));
+                allTasksPanel.add(lbl);
+                allTasksPanel.add(Box.createVerticalStrut(20));
+            }*/
+                allTasksPanel.setBackground(Color.decode("#fbfbfb"));
+                allTaskScrollPane = new JScrollPane(allTasksPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                        JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                allTaskScrollPane.setBounds(300, 100, 500, 550);
+                return allTaskScrollPane;
+            }
+            else{
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        allTasksPanel.setBackground(Color.YELLOW);
-        allTaskScrollPane = new JScrollPane(allTasksPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        allTaskScrollPane.setBounds(300, 100, 500, 550);
-        return allTaskScrollPane;
+        catch (JSONException e) {
+            // JSON Parsing error
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void loadAllProjects(JPanel staticPanel){
+        //Get all projects
+        try {
+            String rawProjectsData = ServerConnectionUtils.getRequest("api/users/projects/" + UserData.getCurrentUser());
+            JSONArray projectsArray = new JSONArray(rawProjectsData);
+            for (int i = 0; i < projectsArray.length(); i++){
+                JSONObject singleProject = projectsArray.getJSONObject(i);
+                String projectName = singleProject.getString("name");
+                String projectId = singleProject.getString("id");
+                JLabel projLbl = new JLabel(projectName);
+                projLbl.setFont(new Font("Segoe UI", Font.PLAIN, 18));
+                projLbl.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                projLbl.addMouseListener(new MouseListener() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mousePressed(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseReleased(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+
+                    }
+                });
+                staticPanel.add(Box.createVerticalStrut(10));
+                staticPanel.add(projLbl);
+                staticPanel.revalidate();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     public BottomPanel() {
@@ -55,47 +156,73 @@ public class BottomPanel extends JPanel {
         setLayout(null);
         add(createAllTasksPanel());
 
-        JLabel lbl = new JLabel("Add Project");
-        lbl.setFont(lbl.getFont().deriveFont(22.3f));
+        JLabel lbl = new JLabel("Projects:");
+        lbl.setFont(new Font("Segoe UI", Font.PLAIN, 25));
         lbl.setBounds(22, 50, 150, 30);
         add(lbl);
 
         JLabel addProjectLbl = new JLabel();
         addProjectLbl.setIcon(addProjectIcon);
-        addProjectLbl.setBounds(170, 30, 62, 60);
+        addProjectLbl.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        addProjectLbl.setBounds(210, 40, 50, 50);
+        addProjectLbl.setToolTipText("Add new project");
         add(addProjectLbl);
 
         JPanel staticProjectPanel = new JPanel();
+        staticProjectPanel.setBorder(new EmptyBorder(0, 5, 0, 0));
         staticProjectPanel.setLayout(new BoxLayout(staticProjectPanel, BoxLayout.Y_AXIS));
-        staticProjectPanel.setBackground(Color.WHITE);
-        projectPanelScrollPane = new JScrollPane(staticProjectPanel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+        staticProjectPanel.setBackground(Color.decode("#fbfbfb"));
+        loadAllProjects(staticProjectPanel);
+        projectPanelScrollPane = new JScrollPane(staticProjectPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         projectPanelScrollPane.setBounds(10, 100, 250, 550);
         add(projectPanelScrollPane);
 
         JButton submitProject = Utility.createButton("Submit", KeyEvent.VK_ENTER);
         submitProject.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        submitProject.setBounds(320, 590, 90, 30);
+        submitProject.setBounds(300, 590, 90, 30);
         currentTasksScroll = new JScrollPane(currentProjectTasks, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        currentTasksScroll.setBounds(300, 180, 500, 460);
+        currentTasksScroll.setBounds(300, 180, 670, 460);
 
         submitProject.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // get Request here
+                String username = UserData.getCurrentUser();
+                String projectName = projectForm.getNameArea().getText();
+                String projectDescription = projectForm.getDescriptionArea().getText();
+                String type = projectForm.getSelectedType();
+                List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
+                urlParameters.add(new BasicNameValuePair("username", username));
+                urlParameters.add(new BasicNameValuePair("projectName", projectName));
+                urlParameters.add(new BasicNameValuePair("projectDescription", projectDescription));
+                urlParameters.add(new BasicNameValuePair("type", type));
+                try {
+                    ServerConnectionUtils.postRequest("api/projects/", urlParameters);
+                    remove(projectForm);
+                    remove(submitProject);
+                    repaint();
+                    revalidate();
+                    toolPanel.setBounds(300, 100, 900, 50);
+                    add(toolPanel);
+                    add(currentTasksScroll);
+                    staticProjectPanel.removeAll();
+                    staticProjectPanel.revalidate();
+                    staticProjectPanel.repaint();
+                    loadAllProjects(staticProjectPanel);
+                   // remove(projectForm);
+                   // remove(submitProject);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                /*
+                remove(currentProjectTasks);
                 JLabel projLbl = new JLabel("  " + projectForm.getNameArea().getText());
                 projLbl.setFont(projLbl.getFont().deriveFont(20.0f));
                 staticProjectPanel.add(Box.createVerticalStrut(20));
                 staticProjectPanel.add(projLbl);
-                staticProjectPanel.revalidate();
-                remove(projectForm);
-                remove(submitProject);
-                toolPanel.setBounds(300, 100, 900, 50);
-                add(toolPanel);
-                add(currentTasksScroll);
-                repaint();
+                */
             }
         });
         addProjectLbl.setCursor(new Cursor(Cursor.HAND_CURSOR));

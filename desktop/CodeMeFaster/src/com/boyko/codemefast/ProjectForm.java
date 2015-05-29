@@ -52,7 +52,15 @@ public class ProjectForm extends JPanel {
         combo.setSelectedIndex(0);
     }
 
+    public String getSelectedType(){
+        return  String.valueOf(combo.getSelectedIndex() + 1);
+    }
+
     public JTextField getNameArea() {
         return nameArea;
+    }
+
+    public JTextArea getDescriptionArea() {
+        return descriptionArea;
     }
 }

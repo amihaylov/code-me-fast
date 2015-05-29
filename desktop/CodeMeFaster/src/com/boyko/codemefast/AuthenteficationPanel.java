@@ -1,37 +1,34 @@
 package com.boyko.codemefast;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
 public class AuthenteficationPanel extends JPanel {
 
     private JLabel userName;
     private JLabel password;
     private JTextField usernameText;
-    private JTextField passwordText;
+    private JPasswordField passwordText;
 
     public AuthenteficationPanel() {
         setLayout(null);
         setBackground(Color.WHITE);
-        JLabel welcome = new JLabel("Welcome");
-        welcome.setBounds(500, 130, 300, 60);
-        welcome.setFont(welcome.getFont().deriveFont(70.0f));
+        JLabel welcome = new JLabel("CODEmeFast.Login");
+        welcome.setBounds(100, 130, 800, 80);
+        welcome.setFont(new Font("Segoe UI", Font.PLAIN, 55));
         userName = new JLabel("UserName");
-        userName.setBounds(550, 250, 100, 30);
+        userName.setBounds(150, 250, 100, 30);
         userName.setFont(userName.getFont().deriveFont(20.0f));
         password = new JLabel("Password");
-        password.setBounds(550, 285, 100, 30);
+        password.setBounds(150, 285, 100, 30);
         password.setFont(password.getFont().deriveFont(20.0f));
         usernameText = new JTextField();
-        usernameText.setBounds(650, 250, 120, 25);
-        passwordText = new JTextField();
-        passwordText.setBounds(650, 290, 120, 25);
+        usernameText.setBounds(250, 250, 120, 25);
+        passwordText = new JPasswordField();
+        passwordText.setBounds(250, 290, 120, 25);
 
         add(welcome);
         add(usernameText);
@@ -53,7 +50,7 @@ public class AuthenteficationPanel extends JPanel {
         return passwordText;
     }
 
-    public void setPasswordText(JTextField passwordText) {
+    public void setPasswordText(JPasswordField passwordText) {
         this.passwordText = passwordText;
     }
 }

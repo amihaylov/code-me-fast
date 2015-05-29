@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2015 at 04:05 PM
+-- Generation Time: May 29, 2015 at 09:40 AM
 -- Server version: 5.6.24
 -- PHP Version: 5.6.8
 
@@ -46,14 +46,7 @@ CREATE TABLE IF NOT EXISTS `codesforsubmition` (
   `uploaddate` int(11) NOT NULL,
   `uploadmonth` int(11) NOT NULL,
   `uploadyear` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
---
--- Dumping data for table `codesforsubmition`
---
-
-INSERT INTO `codesforsubmition` (`id`, `task`, `user`, `code`, `uploaddate`, `uploadmonth`, `uploadyear`) VALUES
-(4, 2, 1, 'sampleCode', 28, 5, 2015);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -107,7 +100,7 @@ CREATE TABLE IF NOT EXISTS `projects` (
   `description` text COLLATE utf8_unicode_ci NOT NULL,
   `type` int(11) NOT NULL DEFAULT '0',
   `admin` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `projects`
@@ -115,7 +108,10 @@ CREATE TABLE IF NOT EXISTS `projects` (
 
 INSERT INTO `projects` (`id`, `projectlevel`, `name`, `description`, `type`, `admin`) VALUES
 (1, 1, 'Just Another Project', 'Some brand new description', 0, 1),
-(3, 1, 'SAS', 'SAAAAS', 0, 2);
+(3, 1, 'SAS', 'SAAAAS', 0, 2),
+(4, 1, 'Sample project', 'Very good and very cheep', 1, 1),
+(5, 1, 'Another sample project', 'Eat this and some shit', 1, 1),
+(18, 1, 'Satanism', '666', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -150,7 +146,15 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `deadlinedate` int(11) NOT NULL,
   `deadlinemonth` int(11) NOT NULL,
   `deadlineyear` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+--
+-- Dumping data for table `tasks`
+--
+
+INSERT INTO `tasks` (`id`, `name`, `description`, `project`, `type`, `user`, `issidequest`, `difficulty`, `finished`, `deadlinedate`, `deadlinemonth`, `deadlineyear`) VALUES
+(4, 'Task', 'asd', 2, 'ui', 1, 0, 1, 0, 12, 12, 2001),
+(5, 'Do the dishes', 'Do the frickin'' dishes', 2, 'ui', 1, 0, -1, 0, 12, 12, 1221);
 
 -- --------------------------------------------------------
 
@@ -168,7 +172,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `backendxp` int(11) NOT NULL DEFAULT '0',
   `avatar` int(11) NOT NULL DEFAULT '1',
   `level` int(11) NOT NULL DEFAULT '1'
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 --
 -- Dumping data for table `users`
@@ -176,7 +180,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `uixp`, `dbxp`, `serverxp`, `backendxp`, `avatar`, `level`) VALUES
 (1, 'pep4eto1211', 'sha1$b7fc081e$1$a97fd77166032f561d1a01a9947ab1ffea8e3d29', 0, 0, 0, 0, 1, 1),
-(2, 'baigosho', 'asdfg', 0, 0, 0, 0, 1, 1);
+(3, 'pesheto', 'sha1$1f85a650$1$fc4b87fdd00db53114821d8a63ad0595f9ecae16', 0, 0, 0, 0, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -287,7 +291,7 @@ ALTER TABLE `achievements`
 -- AUTO_INCREMENT for table `codesforsubmition`
 --
 ALTER TABLE `codesforsubmition`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `messages`
 --
@@ -302,7 +306,7 @@ ALTER TABLE `notifications`
 -- AUTO_INCREMENT for table `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=19;
 --
 -- AUTO_INCREMENT for table `projectsusersxp`
 --
@@ -312,12 +316,12 @@ ALTER TABLE `projectsusersxp`
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT for table `usersachievements`
 --
