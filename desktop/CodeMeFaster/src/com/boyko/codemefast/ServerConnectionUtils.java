@@ -2,9 +2,7 @@ package com.boyko.codemefast;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -31,13 +29,12 @@ public class ServerConnectionUtils {
             HttpEntity entity = getResponse.getEntity();
             BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
             String inputLine = "";
-            while((inputLine = br.readLine()) != null){
+            while ((inputLine = br.readLine()) != null) {
                 response += inputLine;
             }
             br.close();
             EntityUtils.consume(entity);
-        }
-        finally {
+        } finally {
             getResponse.close();
         }
         return response;
@@ -55,14 +52,57 @@ public class ServerConnectionUtils {
             HttpEntity entity = postResponse.getEntity();
             BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
             String inputLine = "";
-            while((inputLine = br.readLine()) != null){
+            while ((inputLine = br.readLine()) != null) {
                 response += inputLine;
             }
             br.close();
             EntityUtils.consume(entity);
-        }
-        finally {
+        } finally {
             postResponse.close();
+        }
+        return response;
+    }
+
+    public static String deleteRequest(String apiUrl) throws IOException {
+        String url = serverUrl + apiUrl;
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpDelete httpDelete = new HttpDelete(url);
+        CloseableHttpResponse getResponse = httpclient.execute(httpDelete);
+        String response = "";
+        try {
+            System.out.println(getResponse.getStatusLine());
+            HttpEntity entity = getResponse.getEntity();
+            BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
+            String inputLine = "";
+            while ((inputLine = br.readLine()) != null) {
+                response += inputLine;
+            }
+            br.close();
+            EntityUtils.consume(entity);
+        } finally {
+            getResponse.close();
+        }
+        return response;
+    }
+
+    public static String putRequest(String apiUrl) throws IOException {
+        String url = serverUrl + apiUrl;
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpPut httpPut = new HttpPut(url);
+        CloseableHttpResponse getResponse = httpclient.execute(httpPut);
+        String response = "";
+        try {
+            System.out.println(getResponse.getStatusLine());
+            HttpEntity entity = getResponse.getEntity();
+            BufferedReader br = new BufferedReader(new InputStreamReader(entity.getContent()));
+            String inputLine = "";
+            while ((inputLine = br.readLine()) != null) {
+                response += inputLine;
+            }
+            br.close();
+            EntityUtils.consume(entity);
+        } finally {
+            getResponse.close();
         }
         return response;
     }

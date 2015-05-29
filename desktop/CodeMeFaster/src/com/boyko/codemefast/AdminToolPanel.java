@@ -10,14 +10,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class AdminToolPanel extends JPanel {
-    private ImageIcon participantImage = new ImageIcon(getClass().getResource("participantImage.jpg"));
-    // private ImageIcon adminImage = new
-    // ImageIcon(getClass().getResource("boiski.jpg"));
-    private ImageIcon addTaskIcon = new ImageIcon(getClass().getResource("addTaskIcon.jpg"));
-    private ImageIcon deleteTaskIcon = new ImageIcon(getClass().getResource("deleteTask.png"));
-    private ImageIcon editDescriptionIcon = new ImageIcon(getClass().getResource("editDescription.jpg"));
-    private ImageIcon deleteUserIcon = new ImageIcon(getClass().getResource("deleteUser.jpg"));
-    private ImageIcon deleteProjectIcon = new ImageIcon(getClass().getResource("deleteProject.jpg"));
+    private ImageIcon participantImage = new ImageIcon(getClass().getResource("Icons/AddUser.png"));
+    private ImageIcon addTaskIcon = new ImageIcon(getClass().getResource("Icons/AddTask.png"));
+    private ImageIcon deleteTaskIcon = new ImageIcon(getClass().getResource("Icons/DeleteTaskIcon.png"));
+    private ImageIcon editDescriptionIcon = new ImageIcon(getClass().getResource("Icons/EditProjectIcon.png"));
+    private ImageIcon deleteUserIcon = new ImageIcon(getClass().getResource("Icons/DeleteUser.png"));
+    private ImageIcon deleteProjectIcon = new ImageIcon(getClass().getResource("Icons/DeleteProject.png"));
     private JLabel addUserLbl;
     private JLabel addTaskLbl;
     private JLabel deleteTaskLbl;
@@ -30,38 +28,32 @@ public class AdminToolPanel extends JPanel {
         setBackground(Color.WHITE);
 
         addUserLbl = new JLabel();
-        addUserLbl.setBounds(5, 0, 40, 50);
+        addUserLbl.setBounds(5, 0, 60, 50);
         addUserLbl.setIcon(participantImage);
         addUserLbl.setToolTipText("Add User");
         add(addUserLbl);
 
         addTaskLbl = new JLabel();
         addTaskLbl.setIcon(addTaskIcon);
-        addTaskLbl.setBounds(50, 0, 40, 50);
+        addTaskLbl.setBounds(65, 0, 60, 50);
         addTaskLbl.setToolTipText("Add Task");
         add(addTaskLbl);
 
-        deleteTaskLbl = new JLabel();
-        deleteTaskLbl.setIcon(deleteTaskIcon);
-        deleteTaskLbl.setBounds(95, 0, 40, 50);
-        deleteTaskLbl.setToolTipText("Delete Task");
-        add(deleteTaskLbl);
-
         editDescriptionLbl = new JLabel();
         editDescriptionLbl.setIcon(editDescriptionIcon);
-        editDescriptionLbl.setBounds(140, 0, 40, 50);
+        editDescriptionLbl.setBounds(185, 0, 60, 50);
         editDescriptionLbl.setToolTipText("Edit Description");
         add(editDescriptionLbl);
 
         deleteUserLbl = new JLabel();
         deleteUserLbl.setIcon(deleteUserIcon);
-        deleteUserLbl.setBounds(190, 0, 40, 50);
+        deleteUserLbl.setBounds(245, 0, 60, 50);
         deleteUserLbl.setToolTipText("Delete User");
         add(deleteUserLbl);
 
         deleteProjectLbl = new JLabel();
         deleteProjectLbl.setIcon(deleteProjectIcon);
-        deleteProjectLbl.setBounds(240, 0, 40, 50);
+        deleteProjectLbl.setBounds(125, 0, 60, 50);
         deleteProjectLbl.setToolTipText("Delete Project");
         add(deleteProjectLbl);
 

@@ -27,6 +27,8 @@ public class BottomPanel extends JPanel {
     private JScrollPane allTaskScrollPane;
     private JScrollPane projectPanelScrollPane;
     private JScrollPane currentTasksScroll;
+    private ImageIcon homeIcon = new ImageIcon(getClass().getResource("Icons/Home.png"));
+    private JButton cancelProjectButton = Utility.createButton("cancel", KeyEvent.VK_ENTER);
     ProjectForm projectForm = new ProjectForm();
     AdminToolPanel toolPanel = new AdminToolPanel();
     UserForm userForm = new UserForm();
@@ -117,7 +119,53 @@ public class BottomPanel extends JPanel {
                 projLbl.addMouseListener(new MouseListener() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-
+                        try {
+                            String isAdmin = ServerConnectionUtils.getRequest("/api/projects/admin/"
+                                    + UserData.getCurrentUser() + "/" + projectId);
+                            System.out.println(isAdmin);
+                            if(isAdmin.equals("yes")){
+                                remove(toolPanel);
+                                remove(currentTasksScroll);
+                                currentProjectTasks.removeAll();
+                                String rawData = ServerConnectionUtils.getRequest("/api/unfinishedtasksforproject/"
+                                        + projectId + "/" + UserData.getCurrentUser());
+                                if(!rawData.equals("no")) {
+                                    JSONArray tasksArray = new JSONArray(rawData);
+                                    currentProjectTasks.populate(tasksArray);
+                                }
+                                remove(projectForm);
+                                remove(allTaskScrollPane);
+                                repaint();
+                                revalidate();
+                                toolPanel.setBounds(300, 100, 900, 50);
+                                add(toolPanel);
+                                add(currentTasksScroll);
+                                revalidate();
+                                repaint();
+                            }
+                            else {
+                                remove(toolPanel);
+                                remove(currentTasksScroll);
+                                currentProjectTasks.removeAll();
+                                String rawData = ServerConnectionUtils.getRequest("/api/unfinishedtasksforproject/"
+                                        + projectId + "/" + UserData.getCurrentUser());
+                                if(!rawData.equals("no")) {
+                                    JSONArray tasksArray = new JSONArray(rawData);
+                                    currentProjectTasks.populateNoAdmin(tasksArray);
+                                }
+                                remove(projectForm);
+                                remove(allTaskScrollPane);
+                                repaint();
+                                revalidate();
+                                add(currentTasksScroll);
+                                revalidate();
+                                repaint();
+                            }
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
                     }
 
                     @Override
@@ -161,6 +209,35 @@ public class BottomPanel extends JPanel {
         lbl.setBounds(22, 50, 150, 30);
         add(lbl);
 
+        JButton submitProject = Utility.createButton("Submit", KeyEvent.VK_ENTER);
+        submitProject.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        submitProject.setBounds(300, 590, 90, 30);
+
+        JLabel homeLbl = new JLabel();
+        homeLbl.setIcon(homeIcon);
+        homeLbl.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        homeLbl.setBounds(150, 40, 50, 50);
+        homeLbl.setToolTipText("Home");
+        add(homeLbl);
+        homeLbl.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                remove(projectForm);
+                remove(currentTasksScroll);
+                remove(submitTask);
+                remove(taskForm);
+                remove(toolPanel);
+                remove(submitTask);
+                remove(userForm);
+                remove(cancelProjectButton);
+                remove(submitProject);
+                add(allTaskScrollPane);
+                revalidate();
+                repaint();
+            }
+        });
+
         JLabel addProjectLbl = new JLabel();
         addProjectLbl.setIcon(addProjectIcon);
         addProjectLbl.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -176,15 +253,32 @@ public class BottomPanel extends JPanel {
         projectPanelScrollPane = new JScrollPane(staticProjectPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         projectPanelScrollPane.setBounds(10, 100, 250, 550);
+        projectPanelScrollPane.setBackground(Color.decode("#fbfbfb"));
         add(projectPanelScrollPane);
 
-        JButton submitProject = Utility.createButton("Submit", KeyEvent.VK_ENTER);
-        submitProject.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        submitProject.setBounds(300, 590, 90, 30);
+        //Cancel button
+
+        cancelProjectButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        cancelProjectButton.setBounds(400, 590, 90, 30);
+        cancelProjectButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                remove(projectForm);
+                remove(submitProject);
+                remove(cancelProjectButton);
+                add(allTaskScrollPane);
+                revalidate();
+                repaint();
+
+            }
+        });
+        add(cancelProjectButton);
+        //
         currentTasksScroll = new JScrollPane(currentProjectTasks, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         currentTasksScroll.setBounds(300, 180, 670, 460);
-
+        currentTasksScroll.getViewport().setView(currentProjectTasks);
         submitProject.addActionListener(new ActionListener() {
 
             @Override
@@ -216,13 +310,6 @@ public class BottomPanel extends JPanel {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                /*
-                remove(currentProjectTasks);
-                JLabel projLbl = new JLabel("  " + projectForm.getNameArea().getText());
-                projLbl.setFont(projLbl.getFont().deriveFont(20.0f));
-                staticProjectPanel.add(Box.createVerticalStrut(20));
-                staticProjectPanel.add(projLbl);
-                */
             }
         });
         addProjectLbl.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -240,6 +327,7 @@ public class BottomPanel extends JPanel {
                 projectForm.setBounds(280, 100, 600, 470);
                 add(projectForm);
                 add(submitProject);
+                add(cancelProjectButton);
                 repaint();
                 projectForm.resetProjectForm();
             }
