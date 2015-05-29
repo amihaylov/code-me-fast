@@ -57,6 +57,26 @@ app.get('/api/users/:username', function (req, res) {
     });
 });
 
+app.get('/api/projects/admin/:username/:projectId', function(req, res){
+    var userId;
+    connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
+        if(rows.length > 0){
+            userId = JSON.parse(JSON.stringify(rows[0])).id;
+            connection.query("SELECT admin FROM projects WHERE id = " + req.params.projectId, function(error, rows, fields){
+                if(JSON.parse(JSON.stringify(rows[0])).admin == userId){
+                    res.end("yes");
+                }
+                else{
+                    res.end("no");
+                }
+            });
+        }
+        else{
+            res.end();
+        }
+    });
+});
+
 //Login logic
 app.post('/api/login', function (req, res) {
     var username = req.body.username;
@@ -140,6 +160,7 @@ app.get('/api/unfinishedtasksforproject/:project/:username', function(req, res){
                     }
                     else{
                         res.end("no");
+                        console.log("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project + " AND finished = 0 AND issidequest = 0");
                     }
                 });
             }
@@ -155,7 +176,8 @@ app.get('/api/alltasksforproject/:project/:username', function(req, res){
         connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
             if(rows.length > 0){
                 userId =  JSON.parse(JSON.stringify(rows[0])).id;
-                connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project, function(error, rows, fields){
+                connection.query("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project, 
+                                 function(error, rows, fields){
                     if(rows.length > 0){
                         var row = rows;
                         res.write(JSON.stringify(row));
@@ -163,6 +185,7 @@ app.get('/api/alltasksforproject/:project/:username', function(req, res){
                     }
                     else{
                         res.end("no");
+                        console.log("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project + " AND finished = 0 AND issidequest = 0");
                     }
                 });
             }
