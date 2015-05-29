@@ -62,19 +62,25 @@ app.post('/api/login', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
     connection.query("SELECT password FROM users WHERE username = '" + username + "'", function(error, rows, fields){
-        if(rows.length > 0){
-            var row = rows[0];
-            if(passwordHash.verify(password, JSON.parse(JSON.stringify(row)).password)){
-                res.write("ok");
-            }
-            else{
-                res.write("no");
-            }
+        if(error){
+            res.end("no");
         }
         else{
-            res.write("nouser");
+            if(rows.length > 0){
+                var row = rows[0];
+                if(passwordHash.verify(password, JSON.parse(JSON.stringify(row)).password)){
+                    res.write("ok");
+                    res.end();
+                }
+                else{
+                    res.end("no");
+                }
+            }
+            else{
+                res.end("nouser");
+            }
+            res.end("");
         }
-        res.end("");
     });
 });
 
@@ -99,6 +105,7 @@ app.post("/api/register", function(req, res){
 app.get('/api/alltasks/:username', function(req, res){
     //Get all tasks for user
     var userId;
+    console.log(req.params.username);
     connection.query("SELECT id FROM users WHERE username = '" + req.params.username + "'", function(error, rows, fields){
         if(rows.length > 0){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
@@ -264,7 +271,7 @@ app.post('/api/projects', function (req, res){
         connection.query("SELECT id FROM users WHERE username = '" + req.body.username + "'", function(error, rows, fields){
             userId =  JSON.parse(JSON.stringify(rows[0])).id;
             connection.query("INSERT INTO projects(name, description, type, admin) VALUES('" + req.body.projectName + "', '" 
-                             + req.body.projectDescription + "', " + req.body.type + ", " + userId + ")", function(error, rows, fields){
+                             + req.body.projectDescription + "', " + req.body.type + ", " + userId + ")", function(error, result){
                 res.end();
             });
         });
