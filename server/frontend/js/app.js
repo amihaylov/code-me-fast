@@ -113,7 +113,7 @@ var CodemefastApp = (function() {
         headerContainer.append(role).append(type);
 
         for (var i=0; i<data.length; i+=1){
-          if(data[i].user === sessionStorage.getItem('userid')){
+          if(data[i].user == sessionStorage.getItem('userid')){
             var row = $('<tr></tr>');
             var cellId = $('<td></td>').text(data[i].id);
             var cellName = $('<td></td>').text(data[i].name);
@@ -147,6 +147,7 @@ var CodemefastApp = (function() {
             var cellEdit = $('<td></td>');
                 cellEdit.append(buttonEdit); 
             rowEdit.append(cellEditText).append(cellEdit);
+            taskContainer.append(row).append(rowEdit);
           }
         }
 
