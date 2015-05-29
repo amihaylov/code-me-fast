@@ -55,6 +55,9 @@ public class NonAdminTask extends JPanel {
                     urlParameters.add(new BasicNameValuePair("code", gitUrl));
                     ServerConnectionUtils.postRequest("api/tasks/", urlParameters);
                     thePanel.setVisible(false);
+                    if(!EventDoer.bach) {
+                        JOptionPane.showMessageDialog(null, "You just leveled up!");
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }

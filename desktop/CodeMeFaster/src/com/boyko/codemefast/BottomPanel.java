@@ -135,6 +135,7 @@ public class BottomPanel extends JPanel {
                                 }
                                 remove(projectForm);
                                 remove(allTaskScrollPane);
+                                remove(cancelProjectButton);
                                 repaint();
                                 revalidate();
                                 toolPanel.setBounds(300, 100, 900, 50);
@@ -146,6 +147,7 @@ public class BottomPanel extends JPanel {
                             else {
                                 remove(toolPanel);
                                 remove(currentTasksScroll);
+                                remove(cancelProjectButton);
                                 currentProjectTasks.removeAll();
                                 String rawData = ServerConnectionUtils.getRequest("/api/unfinishedtasksforproject/"
                                         + projectId + "/" + UserData.getCurrentUser());
@@ -203,6 +205,10 @@ public class BottomPanel extends JPanel {
         setBackground(Color.WHITE);
         setLayout(null);
         add(createAllTasksPanel());
+
+        AvatarPanel avatarPanel = new AvatarPanel("10","pep4eto1211","1431");
+        avatarPanel.setBounds(820, 5, 170, 80);
+        add(avatarPanel);
 
         JLabel lbl = new JLabel("Projects:");
         lbl.setFont(new Font("Segoe UI", Font.PLAIN, 25));
@@ -305,6 +311,10 @@ public class BottomPanel extends JPanel {
                     staticProjectPanel.revalidate();
                     staticProjectPanel.repaint();
                     loadAllProjects(staticProjectPanel);
+                    if (!EventDoer.ach) {
+                        JOptionPane.showMessageDialog(null, "You recieved 'The manager' achievement!");
+                        avatarPanel.xp.setText("XP: 1520");
+                    }
                    // remove(projectForm);
                    // remove(submitProject);
                 } catch (IOException e1) {
@@ -363,6 +373,25 @@ public class BottomPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // request here
+                String taskName = taskForm.getName();
+                String description = taskForm.getDescriptionArea().getText();
+                String type = taskForm.getComboType();
+                List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
+                urlParameters.add(new BasicNameValuePair("username", UserData.getCurrentUser()));
+                urlParameters.add(new BasicNameValuePair("description", description));
+                urlParameters.add(new BasicNameValuePair("taskName", taskName));
+                urlParameters.add(new BasicNameValuePair("type", type));
+                urlParameters.add(new BasicNameValuePair("projectId", "1"));
+                urlParameters.add(new BasicNameValuePair("issidequest", "0"));
+                urlParameters.add(new BasicNameValuePair("difficulty", "1"));
+                urlParameters.add(new BasicNameValuePair("dldate", "11"));
+                urlParameters.add(new BasicNameValuePair("dlmonth", "11"));
+                urlParameters.add(new BasicNameValuePair("dlyear", "1111"));
+                try {
+                    ServerConnectionUtils.postRequest("/api/task", urlParameters);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
                 taskForm.resetTaskForm();
                 taskForm.getDescriptionArea().setText("  ADD NEW TASK");
             }

@@ -29,6 +29,34 @@ public class TaskForm extends JPanel {
     private JTextField nameArea;
     private JLabel chooseUser;
 
+    public String getEndDay() {
+        return endDay.getSelectedItem().toString();
+    }
+
+    public String getEndMonth() {
+        return endMonth.getSelectedItem().toString();
+    }
+
+    public String getEndYear() {
+        return endYear.getSelectedItem().toString();
+    }
+
+    public String getComboLevel() {
+        return "1";
+    }
+
+    public String getComboType() {
+        return comboType.getSelectedItem().toString();
+    }
+
+    public JTextField getNameArea() {
+        return nameArea;
+    }
+
+    public JLabel getChooseUser() {
+        return chooseUser;
+    }
+
     public TaskForm() {
         setLayout(null);
         JLabel taskName = Utility.createLable("Task Name", 20, 5, 10, 100, 50);
@@ -57,7 +85,6 @@ public class TaskForm extends JPanel {
         comboType.addItem("Server");
         comboType.addItem("Code behind");
         comboType.setBounds(170, 120, 160, 30);
-
         JLabel chooseDifficulty = Utility.createLable("Choose Difficulty", 20, 5, 80, 200, 50);
         comboLevel = new JComboBox<>();
         comboLevel.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -69,6 +96,7 @@ public class TaskForm extends JPanel {
 
         JLabel chooseUser = Utility.createLable("Choose User", 20, 5, 137, 200, 50);
         userCombo = new JComboBox<String>();
+        userCombo.addItem("CodeMaster12");
         userCombo.setCursor(new Cursor(Cursor.HAND_CURSOR));
         getUserCombo().setBounds(170, 150, 160, 30);
         add(chooseUser);

@@ -160,7 +160,6 @@ app.get('/api/unfinishedtasksforproject/:project/:username', function(req, res){
                     }
                     else{
                         res.end("no");
-                        console.log("SELECT * FROM tasks WHERE user = " + userId + " AND project = " + req.params.project + " AND finished = 0 AND issidequest = 0");
                     }
                 });
             }
