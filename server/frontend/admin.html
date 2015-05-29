@@ -67,26 +67,29 @@
           </p>
           
          <h1 id="project-header" class="page-header">
-            Project1
-            <p class="lead">Role (User or Admin)</p>
-            <p class="lead">Type of project</p>
+            Add Project
           </h1>
 
           <div class="row placeholders">
-            <div class="col-xs-6 col-sm-3 placeholder text-center">
-              <h4>Description</h4>
-              <span class="text-muted">Some description</span>
-            </div>
-            <div class="col-xs-6 col-sm-3 placeholder text-center">
-              <h4>Admin</h4>
-              <span class="text-muted">GOD</span>
-            </div>
-          <div class="col-xs-6 col-sm-3 placeholder text-center">
-              <h4>Project Level</h4>
-              <span class="text-muted">ÜBER HART</span>
-            </div>
-          </div>
-          
+            <form class="form-inline" role="form">
+              <div class="form-group">
+                <label for="project-name">Project Name:</label>
+                <input type="name" class="form-control" id="project-name" placeholder="Enter name">
+              </div>
+              <div class="form-group">
+                <label for="project-description">Description:</label>
+                <input type="name" class="form-control" id="project-description" placeholder="Enter description">
+              </div>
+              <div class="form-group">
+                <label for="project-type">Type:</label>
+                <input type="name" class="form-control" id="project-type" placeholder="Enter description">
+              </div>
+              <div class="form-group">
+                <label for="project-level">Level:</label>
+                <input type="name" class="form-control" id="project-level" placeholder="Enter description">
+              </div>
+              <button type="submit" class="btn btn-success">Submit</button>
+            </form>
           <hr>
 
           <h2 class="sub-header">Tasks</h2>
@@ -94,31 +97,25 @@
             <table class="table table-striped">
               <thead>
                 <tr>
-                  <th>id</th>
                   <th>Name</th>
                   <th>Description</th>
                   <th>Type</th>
                   <th>Difficulty</th>
-                  <th>Finished</th>
+                  <th>Is Side Quest</th>
                   <th>Deadline</th>
+                  <th>Assign to user</th>
                 </tr>
               </thead>
               <tbody id="task-container">
                 <tr>
-                  <td>1</td>
-                  <td>Build UI</td>
-                  <td>HTML CSS</td>
-                  <td>UI</td>
-                  <td>Easy</td>
-                  <td>No</td>
-                  <td>17-06-2015</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>Build DB</td>
-                  <td>SQL</td>
-                  <td>DB</td>
-                  <td>Medium</td>
+                  <td><input id="set-name" type="text"></td>
+                  <td><input id="set-desc" type="text"></td>
+                  <td><input id="set-type" type="text"></td>
+                  <td><input id="set-diff" type="text"></td>
+                  <td><input id="set-sideq" type="text"></td>
+                  <td><input id="set-deadline" type="text"></td>
+                  <td><input id="set-assign" type="text"></td>
+                  <td><button type="button" class="btn btn-success" id="submit">Add Task</button></td>
                 </tr>
               </tbody>
             </table>
@@ -136,6 +133,7 @@
     <script src="js/scripts.js"></script>
     <script src="js/app.js"></script>
     <script src="js/index.js"></script>
+    <script src="js/admin.js"></script>
 
   </body>
 </html>

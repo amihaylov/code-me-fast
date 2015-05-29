@@ -1,15 +1,14 @@
-"use strict"
 // on document ready
 $( document ).ready(function(){
    // init stuff here
-   	CodemefastApp.getUser(sessionStorage.getItem('username'));
+   var user = sessionStorage.getItem('username');
+   	CodemefastApp.getUser(user);
 
-    $('#your-projects').on('click', function(){
-    	CodemefastApp.getProjectsByUsername(sessionStorage.getItem('username'));
-    });
+    CodemefastApp.getProjectsByUsername(user);
+    CodemefastApp.getUser(user);
 
-    $('.projects').on('click', function(){
-    	var id = $(this).attr('id');
-    	CodemefastApp.getTasksByProjectAndUsername(id, sessionStorage.getItem('username'));
+    $('.logout').bind('click', function(){
+    	sessionStorage.setItem('username', '');
+    	location.href = "login.html";
     });
 })

@@ -3,12 +3,11 @@
 $( document ).ready(function(){
    // init stuff here
    	var status;
-    $('#submit').on('submit', function(){
+    $('#submit').on('click', function(){
     	var loginData = {
     		username: $('#username').val(),
     		password: $('#password').val()
     	};
 		CodemefastApp.loginUser(loginData);
-		return false;
     });
 })
